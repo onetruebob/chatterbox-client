@@ -5,16 +5,25 @@ var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   username: null,
   room: 'lobby',
+  $nameField: null,
   $msgField: null,
   $messages: null
 };
 
 app.init = function(){
   app.username = app._getLocalUsername();
+  app.$nameField = $('#username');
+  app.$nameField.val(app.username);
   app.$msgField = $('#message');
   app.$messages = $('#messages');
   app.fetch();
   setInterval(app.fetch, 2000);
+
+  app.$nameField.on('change',function(e){
+    app.username = app.$nameField.val() || 'anonymous';
+    var newSearch = 'username=' + app.username;
+    window.location.search = newSearch;
+  });
 
   $('#submit').on('click', function(e){
     e.preventDefault();
@@ -69,7 +78,7 @@ app.fetch = function(){
 //     username: "gary"
 
 app._getLocalUsername = function(){
-  return window.location.search.split('=')[1];
+  return decodeURI(window.location.search.split('=')[1]);
 };
 
 
