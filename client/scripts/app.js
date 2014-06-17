@@ -16,6 +16,10 @@ var app = {
 };
 
 app.init = function(){
+  if(app.$messages) { //If we've been able to get jQuery nodes in previous calls
+    return;
+  }
+
   app.username = app._getLocalUsername();
   app.$roomSelect = $('#roomSelect');
   app.$nameField = $('#username');
@@ -31,10 +35,13 @@ app.init = function(){
     window.location.search = newSearch;
   });
 
-  $('#submit').on('click', function(e){
+  $('#send .submit').on('click', function(e){
     e.preventDefault();
-    var messageText = app.$msgField.val();
-    app.send({ roomname: app.room, text: messageText, username: app.username});
+    $(this).trigger('submit');
+  });
+
+  $('#send .submit').on('submit', function(e){
+    app.handleSubmit();
   });
 
 };
@@ -73,6 +80,11 @@ app.fetch = function(){
       console.log('chatterbox: fetch failed.'); ////////////////////////////////////////////////
     }
   });
+};
+
+app.handleSubmit = function (){
+  var messageText = app.$msgField.val();
+  app.send({ roomname: app.room, text: messageText, username: app.username});
 };
 
 app.addRoom = function (uRoomName) {
@@ -138,4 +150,4 @@ app._htmlFromMsgObj = function(msgObj){
       '</p></div>';
 };
 
-app.init();
+//app.init();
