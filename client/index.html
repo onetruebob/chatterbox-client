@@ -17,11 +17,13 @@
       <form action="#" id="send" method="post">
         <label for="username">Name:</label>
         <input type="text" name="username" id="username"/><br>
+        <label for="roomname">Room:</label>
+        <select type="select" name="roomname" id="roomSelect"/></select><br>
         <label for="message">Message:</label>
         <input type="text" name="message" id="message"/>
         <input type="submit" name="submit" id="submit" class="submit"/>
       </form>
-      <div id="messages"></div>
+      <div id="chats"></div>
     </div>
   </body>
   <script src="scripts/app.js"></script>

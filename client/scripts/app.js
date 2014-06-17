@@ -1,10 +1,15 @@
 // YOUR CODE HERE:
 
+// parkpigz" onmouseover="alert('pownage!')
+// parkpigz' onmouseover='alert("pownage!")   Breaks ours from the user form
 
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   username: null,
   room: 'lobby',
+  rooms: {},
+  friends: {},
+  $roomSelect: null,
   $nameField: null,
   $msgField: null,
   $messages: null
@@ -12,10 +17,11 @@ var app = {
 
 app.init = function(){
   app.username = app._getLocalUsername();
+  app.$roomSelect = $('#roomSelect');
   app.$nameField = $('#username');
   app.$nameField.val(app.username);
   app.$msgField = $('#message');
-  app.$messages = $('#messages');
+  app.$messages = $('#chats');
   app.fetch();
   setInterval(app.fetch, 2000);
 
@@ -69,6 +75,37 @@ app.fetch = function(){
   });
 };
 
+app.addRoom = function (uRoomName) {
+  var sRoomName = app._htmlEncode(uRoomName);
+  if(!app.rooms[sRoomName]) {
+    var roomHtml = '<option value="'+sRoomName+'">'+sRoomName+'</option>';
+    app.rooms[sRoomName] = $(roomHtml);
+    app.$roomSelect.append(app.rooms[sRoomName]);
+  }
+};
+
+app.addMessage = function(msgObj){
+  var $msgNode = $(app._htmlFromMsgObj(msgObj));
+  var $userNameNode = $msgNode.find('.username');
+  if(app.friends[$userNameNode.text()]) {
+    $userNameNode.addClass('friend');
+  }
+  app.$messages.append($msgNode);
+  $userNameNode.on('click', function(e){
+    e.preventDefault();
+    app.addFriend($(this).text());
+  });
+  app.addRoom(msgObj.roomname);
+};
+
+app.addFriend = function (friendName){
+  app.friends[friendName] = true;
+};
+
+app.clearMessages = function(){
+  app.$messages.empty();
+};
+
 // message object returned by GET
 //     createdAt: "2013-10-07T16:22:03.280Z"
 //     objectId: "teDOY3Rnpe"
@@ -81,11 +118,10 @@ app._getLocalUsername = function(){
   return decodeURI(window.location.search.split('=')[1]);
 };
 
-
 app._renderMessages = function(messages){
-  app.$messages.empty(); // TODO: Possibly make this less wasteful
+  app.clearMessages();
   _(messages).each(function(msgObj){
-    app.$messages.append($(app._htmlFromMsgObj(msgObj)));
+    app.addMessage(msgObj);
   });
 };
 
@@ -95,7 +131,8 @@ app._htmlEncode = function(unencodedString){
 
 // Given a message object, return an HTML string formatted for our app.
 app._htmlFromMsgObj = function(msgObj){
-  return '<div class="message"><p>'+app._htmlEncode(msgObj.username)+
+  return '<div class="message"><p>'+
+      '<span class="username">'+app._htmlEncode(msgObj.username)+'</span>'+
       ' said: '+app._htmlEncode(msgObj.text)+
       '<br>On: '+app._htmlEncode(msgObj.createdAt)+
       '</p></div>';
