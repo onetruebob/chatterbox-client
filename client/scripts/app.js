@@ -9,6 +9,7 @@ var app = {
 app.init = function(){
   app.$messages = $('#messages');
   app.fetch();
+  setInterval(app.fetch, 2000);
 };
 
 app.send = function(message){
@@ -53,6 +54,7 @@ app.fetch = function(){
 //     username: "gary"
 
 app._renderMessages = function(messages){
+  app.$messages.empty(); // TODO: Possibly make this less wasteful
   _(messages).each(function(msgObj){
     app.$messages.append($(app._htmlFromMsgObj(msgObj)));
   });
